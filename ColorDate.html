@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date to Color Converter</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #121214;
+            color: #f4f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: #1e1e24;
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 { margin-top: 0; color: #fff; font-size: 1.8rem; }
+        p { color: #a0a0ab; font-size: 0.95rem; margin-bottom: 1.5rem; }
+        input[type="date"] {
+            font-size: 1.2rem;
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #3a3a42;
+            background: #2a2a32;
+            color: #fff;
+            width: 85%;
+            margin-bottom: 1rem;
+            outline: none;
+            text-align: center;
+        }
+        button {
+            background: #6366f1;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 2rem;
+            width: 90%;
+            transition: background 0.2s ease;
+        }
+        button:hover { background: #4f46e5; }
+        .result-card {
+            background: #25252e;
+            padding: 2rem;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.75rem;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .color-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background-color: #fff;
+            transition: background-color 0.3s ease;
+        }
+        .method-title { font-weight: bold; font-size: 1.2rem; color: #fff; }
+        .code-display { 
+            font-family: monospace; 
+            font-size: 1.1rem;
+            background: rgba(0,0,0,0.4); 
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            color: #34d399;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Date to Color Converter</h1>
+    <p>Convert any date into a vibrant, custom color using Normalized RGB math.</p>
+    
+    <input type="date" id="dateInput">
+    <button id="convertBtn">Generate Color</button>
+
+    <div class="result-card">
+        <div class="method-title">Your Date's Color</div>
+        <div id="preview" class="color-preview"></div>
+        <span id="hexDisplay" class="code-display">#FFFFFF</span>
+    </div>
+</div>
+
+<script>
+    const dateInput = document.getElementById('dateInput');
+    const convertBtn = document.getElementById('convertBtn');
+
+    // Set default date to today
+    const today = new Date();
+    dateInput.value = today.toISOString().split('T')[0];
+
+    function updateColors() {
+        const dateValue = dateInput.value;
+        if (!dateValue) return;
+
+        // Split the YYYY-MM-DD string
+        const dateParts = dateValue.split('-');
+        const yearFull = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10);
+        const day = parseInt(dateParts[2], 10);
+        const yearTwoDigit = yearFull % 100;
+
+        // NORMALIZED RGB MATH
+        // Stretch 1-12 months to 0-255
+        const r = Math.round((month / 12) * 255);
+        // Stretch 1-31 days to 0-255
+        const g = Math.round((day / 31) * 255);
+        // Stretch 0-99 years to 0-255 (handling '00 years gracefully)
+        const yDivisor = yearTwoDigit === 0 ? 1 : yearTwoDigit;
+        const b = Math.round((yDivisor / 99) * 255);
+
+        // Convert the RGB numbers to a standard Hex string
+        const toHex = (c) => c.toString(16).padStart(2, '0');
+        const hexColor = ('#' + toHex(r) + toHex(g) + toHex(b)).toUpperCase();
+        
+        // Update the website page elements
+        document.getElementById('preview').style.backgroundColor = hexColor;
+        document.getElementById('hexDisplay').innerText = hexColor;
+    }
+
+    // Event listeners to handle clicking or changing the date picker
+    convertBtn.addEventListener('click', updateColors);
+    dateInput.addEventListener('change', updateColors);
+    dateInput.addEventListener('input', updateColors);
+    
+    // Run once on load so it isn't blank
+    updateColors();
+</script>
+
+</body>
+</html>
